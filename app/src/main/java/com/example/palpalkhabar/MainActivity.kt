@@ -3,30 +3,33 @@ package com.example.palpalkhabar
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.palpalkhabar.`Retero-fit`.Common
-import com.example.palpalkhabar.`Retero-fit`.ReterofitService
+import androidx.recyclerview.widget.RecyclerView
+import com.example.palpalkhabar.Reterofi.Common
+import com.example.palpalkhabar.Reterofi.ReterofitService
+
 import com.example.palpalkhabar.adapter.neewsAdapter
-import com.example.palpalkhabar.model.Article
 import kotlinx.android.synthetic.main.activity_main.*
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
 
 class MainActivity : AppCompatActivity() {
-
     lateinit var mService: ReterofitService
     lateinit var layoutManager: LinearLayoutManager
-    lateinit var areeb: neewsAdapter
+    lateinit var recyclerView: RecyclerView
+    lateinit var mAdapter: neewsAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mService=Common.reterofitService
-
-        recyclerview.setHasFixedSize(true)
+        //recyclerView=findViewById(R.id.recyclerview)
+        mService= Common.reterofitService
+        news_recyclerview.setHasFixedSize(true)
         layoutManager= LinearLayoutManager(this)
-        recyclerview.layoutManager=layoutManager
+        news_recyclerview.layoutManager=layoutManager
 
 
         getNews()
@@ -34,18 +37,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getNews() {
-        
-        mService.getNewsList().enqueue(object : Callback<MutableList<Article>> {
-            override fun onResponse(call: Call<MutableList<Article>>, response: Response<MutableList<Article>>) {
-                areeb= neewsAdapter(response.body() as MutableList<Article>)
-                areeb.notifyDataSetChanged()
-                recyclerview.adapter=areeb
-            }
-
-            override fun onFailure(call: Call<MutableList<Article>>, t: Throwable) {
+        mService.getNews().enqueue(object :Callback<com.example.palpalkhabar.Response>{
+            override fun onResponse(call: Call<com.example.palpalkhabar.Response>, response: Response<com.example.palpalkhabar.Response>) {
+                val newsList=response.body()!!.articles
+                mAdapter=neewsAdapter(newsList)
+                news_recyclerview.adapter=mAdapter
 
             }
 
+            override fun onFailure(call: Call<com.example.palpalkhabar.Response>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
 
         })
     }
